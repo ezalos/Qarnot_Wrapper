@@ -122,11 +122,12 @@ class Qarnot_Wrapper():
 			# This will return True as soon as the task is complete, or False
 			# after the timeout.
 			done = task.wait(5)
-			self.fetch_fresh_output()
+			self.fetch_fresh_output(task)
 
 		# Display errors on failure
 		if task.state == 'Failure':
 			print(RED + "** Errors:" + RESET + " %s" % task.errors[0])
+			return
 			# error_happened = True
 
 		# Download results from output_bucket into given folder
@@ -167,7 +168,7 @@ if __name__ == "__main__":
 			"-o",
 			"--docker",
 			default="ezalos/qarnot_1stdqn:2.00",
-			help="Docker container to use, ie: ezalos/qarnot_1stdqn: 2.00")
+			help="Docker container to use, ie: ezalos/qarnot_1stdqn:2.00")
 	parser.add_argument(
 			"-m",
 			"--multi_core",
