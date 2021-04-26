@@ -53,8 +53,8 @@ class Qarnot_Wrapper():
 		elif args.command:
 			task = self.prepare_task()
 			self.prepare_docker(task)
-			if args.directory:
-				self.import_folder(args.directory, True)
+			# if args.directory:
+			self.import_folder(args.directory, task, False)
 			self.launch(task)
 		else:
 			print(RED + "Please specify an action to perform" + RESET)
