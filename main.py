@@ -33,25 +33,25 @@ class Qarnot_Wrapper():
 				print(str(t))
 			return
 
-		task = self.conn.retrieve_task(args.uuid)
-		if task:
-			print(GREEN + "Task found `" + YELLOW + task.uuid + RESET + "`!" + RESET)
-		else:
-			print(RED + "Error: no task found" + RESET)
-			# TODO Exit with status 1
-			return
-
-		if args.abort:
-			task.abort()
-			print("Aborted task `" + YELLOW + task.uuid + RESET + "`")
-		elif args.stdout:
-			self.fetch_fresh_output(task)
-		elif args.retrieve:
-			dir = 'output-' + args.uuid
-			print("\tDownloading results from task in " + YELLOW + dir + RESET + " directory...")
-			task.results.get_all_files(dir)
+		if args.uuid:
+			task = self.conn.retrieve_task(args.uuid)
+			if task:
+				print(GREEN + "Task found `" + YELLOW + task.uuid + RESET + "`!" + RESET)
+			else:
+				print(RED + "Error: no task found" + RESET)
+				# TODO Exit with status 1
+				return
+			if args.stdout:
+				self.fetch_fresh_output(task)
+			if args.retrieve:
+				dir = 'output-' + args.uuid
+				print("\tDownloading results from task in " + YELLOW + dir + RESET + " directory...")
+				task.results.get_all_files(dir)
+			if args.abort:
+				task.abort()
+				print("Aborted task `" + YELLOW + task.uuid + RESET + "`")
 		elif args.command:
-			self.prepare_task(task)
+			task = self.prepare_task()
 			self.prepare_docker(task)
 			if args.directory:
 				self.import_folder(args.directory, True)
@@ -61,12 +61,13 @@ class Qarnot_Wrapper():
 			# TODO Exit with status 1
 		# TODO Exit with status 0
 
-	def prepare_task(self, task):
+	def prepare_task(self):
 		profile = 'docker-network' if args.internet else 'docker-batch'
 		task = self.conn.create_task(self.name, profile, self.args.multi_core)
 		print("Task " + BLUE + self.name + RESET + ":")
 		print("\tProfile:\t" + YELLOW + profile + RESET)
 		print("\tNb cores:\t" + YELLOW + str(self.args.multi_core) + RESET)
+		return task
 
 	def prepare_docker(self, task):
 		task.constants['DOCKER_REPO'] = self.args.docker
